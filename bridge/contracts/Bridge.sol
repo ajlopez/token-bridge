@@ -6,6 +6,7 @@ import "./Transferable.sol";
 contract Bridge is Transferable {
     address public manager;
     ERC20 public token;
+    uint16 public noEvents;
     
     mapping (address => address) mappedAddresses;
 
@@ -15,6 +16,10 @@ contract Bridge is Transferable {
     modifier onlyManager() {
         require(msg.sender == manager);
         _;
+    }
+    
+    function setNoEvents(uint16 value) public {
+        noEvents = value;
     }
     
     constructor(address _manager, ERC20 _token) public {
@@ -54,9 +59,14 @@ contract Bridge is Transferable {
         if (!token.transferFrom(msg.sender, address(this), amount))
             return false;
             
+        if (noEvents > 0)
+            return true;
+            
         address receiver = getMappedAddress(msg.sender);
         
         emit TransferTo(receiver, amount);
+        
+        return true;
     }
 }
 

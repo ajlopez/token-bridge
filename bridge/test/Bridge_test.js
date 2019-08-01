@@ -145,6 +145,30 @@ contract('Bridge', function (accounts) {
             assert.ok(balance);
             assert.equal(balance, 1000);
         });
+        
+        it('cannot receive tokens if not enough balance', async function () {
+            await this.token.approve(this.bridge.address, 500, { from: tokenOwner });
+            await expectThrow(this.bridge.receiveTokens(1000, { from: tokenOwner }));
+            
+            const balance = await this.token.balanceOf(this.bridge.address);
+            
+            assert.ok(balance);
+            assert.equal(balance, 0);
+        });
+        
+        it('receive tokens with no event', async function () {
+            await this.bridge.setNoEvents(10);
+            await this.token.approve(this.bridge.address, 1000, { from: tokenOwner });
+            const result = await this.bridge.receiveTokens(1000, { from: tokenOwner });
+            
+            assert.ok(result);
+            assert.equal(result.logs.length, 0);
+            
+            const balance = await this.token.balanceOf(this.bridge.address);
+            
+            assert.ok(balance);
+            assert.equal(balance, 1000);
+        });
     });
 });
 
