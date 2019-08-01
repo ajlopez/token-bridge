@@ -130,14 +130,20 @@ contract('Bridge', function (accounts) {
         
         it('receive tokens', async function () {
             await this.token.approve(this.bridge.address, 1000, { from: tokenOwner });
-            await this.bridge.receiveTokens(1000, { from: tokenOwner });
-            
-            const result = await this.token.balanceOf(this.bridge.address);
+            const result = await this.bridge.receiveTokens(1000, { from: tokenOwner });
             
             assert.ok(result);
-            assert.equal(result, 1000);
+            assert.ok(result.logs);
+            assert.ok(result.logs[0]),
+            assert.equal(result.logs[0].event, 'TransferTo');
+            assert.ok(result.logs[0].args);
+            assert.equal(result.logs[0].args.receiver, tokenOwner);
+            assert.equal(result.logs[0].args.value.toNumber(), 1000);
             
-            // TODO emit event
+            const balance = await this.token.balanceOf(this.bridge.address);
+            
+            assert.ok(balance);
+            assert.equal(balance, 1000);
         });
     });
 });

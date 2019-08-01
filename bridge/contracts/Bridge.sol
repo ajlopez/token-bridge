@@ -8,7 +8,10 @@ contract Bridge is Transferable {
     ERC20 public token;
     
     mapping (address => address) mappedAddresses;
-    
+
+    event TransferTo(address indexed receiver, uint256 value);
+    event TransferToMany(address[] indexed receivers, uint256[] values);
+
     modifier onlyManager() {
         require(msg.sender == manager);
         _;
@@ -50,6 +53,10 @@ contract Bridge is Transferable {
     function receiveTokens(uint256 amount) public returns (bool) {
         if (!token.transferFrom(msg.sender, address(this), amount))
             return false;
+            
+        address receiver = getMappedAddress(msg.sender);
+        
+        emit TransferTo(receiver, amount);
     }
 }
 
