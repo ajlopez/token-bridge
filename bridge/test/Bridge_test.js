@@ -18,6 +18,12 @@ contract('Bridge', function (accounts) {
             this.bridge = await Bridge.new(bridgeManager, this.token.address, { from: bridgeOwner });
         });
         
+        it('check owner', async function () {
+            const owner = await this.bridge.owner();
+            
+            assert.equal(owner, bridgeOwner);
+        });
+        
         it('check manager', async function () {
             const manager = await this.bridge.manager();
             
@@ -146,6 +152,12 @@ contract('Bridge', function (accounts) {
             assert.equal(balance, 1000);
         });
         
+        it('initial number of events', async function () {
+            const noevents = await this.bridge.noEvents();
+                        
+            assert.equal(noevents, 0);
+        });
+        
         it('cannot receive tokens if not enough balance', async function () {
             await this.token.approve(this.bridge.address, 500, { from: tokenOwner });
             await expectThrow(this.bridge.receiveTokens(1000, { from: tokenOwner }));
@@ -156,8 +168,16 @@ contract('Bridge', function (accounts) {
             assert.equal(balance, 0);
         });
         
+        it('only bridge owner can change the number of events', async function () {
+            await expectThrow(this.bridge.setNoEvents(10, { from: anAccount }));
+            
+            const noevents = await this.bridge.noEvents();
+                        
+            assert.equal(noevents, 0);
+        });
+        
         it('receive tokens with no event', async function () {
-            await this.bridge.setNoEvents(10);
+            await this.bridge.setNoEvents(10, { from: bridgeOwner });
             await this.token.approve(this.bridge.address, 1000, { from: tokenOwner });
             const result = await this.bridge.receiveTokens(1000, { from: tokenOwner });
             
