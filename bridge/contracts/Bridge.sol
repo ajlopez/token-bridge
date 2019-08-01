@@ -45,6 +45,11 @@ contract Bridge is Transferable {
             return account;
             
         return mapped;
-    }    
+    }
+    
+    function receiveTokens(uint256 amount) public returns (bool) {
+        if (!token.transferFrom(msg.sender, address(this), amount))
+            return false;
+    }
 }
 

@@ -121,5 +121,24 @@ contract('Bridge', function (accounts) {
             assert.equal(result, anotherAccount);
         });
     });
+    
+    describe('bridge receives tokens', function () {
+        beforeEach(async function () {
+            this.token = await MainToken.new("MAIN", "MAIN", 18, 10000, { from: tokenOwner });
+            this.bridge = await Bridge.new(bridgeManager, this.token.address, { from: bridgeOwner });
+        });
+        
+        it('receive tokens', async function () {
+            await this.token.approve(this.bridge.address, 1000, { from: tokenOwner });
+            await this.bridge.receiveTokens(1000, { from: tokenOwner });
+            
+            const result = await this.token.balanceOf(this.bridge.address);
+            
+            assert.ok(result);
+            assert.equal(result, 1000);
+            
+            // TODO emit event
+        });
+    });
 });
 
