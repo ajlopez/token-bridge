@@ -150,6 +150,10 @@ contract('Bridge', function (accounts) {
             
             assert.ok(balance);
             assert.equal(balance, 1000);
+
+            const notransfers = await this.bridge.getNoTransfers();
+
+            assert.equal(notransfers, 0);
         });
         
         it('initial number of events', async function () {
@@ -160,6 +164,10 @@ contract('Bridge', function (accounts) {
         
         it('no initial transfer', async function () {
             await expectThrow(this.bridge.transfers(0));
+
+            const notransfers = await this.bridge.getNoTransfers();
+
+            assert.equal(notransfers, 0);
         });
         
         it('cannot receive tokens if not enough balance', async function () {
@@ -180,7 +188,7 @@ contract('Bridge', function (accounts) {
             assert.equal(noevents, 0);
         });
         
-        it('receive tokens with no event', async function () {
+        it('receive tokens with no event adding transfer', async function () {
             await this.bridge.setNoEvents(10, { from: bridgeOwner });
             await this.token.approve(this.bridge.address, 1000, { from: tokenOwner });
             const result = await this.bridge.receiveTokens(1000, { from: tokenOwner });
@@ -192,6 +200,15 @@ contract('Bridge', function (accounts) {
             
             assert.ok(balance);
             assert.equal(balance, 1000);
+            
+            const notransfers = await this.bridge.getNoTransfers();
+
+            assert.equal(notransfers, 1);
+            
+            const transfer = await this.bridge.transfers(0);
+            
+            assert.equal(transfer.receiver, tokenOwner);
+            assert.equal(transfer.amount, 1000);
         });
     });
 });

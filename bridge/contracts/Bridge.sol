@@ -73,14 +73,18 @@ contract Bridge is Transferable {
         if (!token.transferFrom(msg.sender, address(this), amount))
             return false;
             
-        if (noEvents > 0)
-            return true;
-            
         address receiver = getMappedAddress(msg.sender);
         
-        emit TransferTo(receiver, amount);
+        if (noEvents > 0)
+            transfers.push(Transfer(receiver, amount));
+        else
+            emit TransferTo(receiver, amount);
         
         return true;
+    }
+    
+    function getNoTransfers() public view returns (uint256) {
+        return transfers.length;
     }
 }
 
