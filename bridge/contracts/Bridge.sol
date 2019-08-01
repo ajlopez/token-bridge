@@ -20,6 +20,8 @@ contract Bridge is Transferable {
 
     event TransferTo(address indexed receiver, uint256 value);
     event TransferToMany(address[] indexed receivers, uint256[] values);
+    event TransferToMany2(Transfer[] transfers);
+    event TransferToMany3(uint256[] data);
 
     modifier onlyOwner() {
         require(msg.sender == owner);
@@ -85,6 +87,34 @@ contract Bridge is Transferable {
     
     function getNoTransfers() public view returns (uint256) {
         return transfers.length;
+    }
+    
+    function emitAllTransfers() public returns (bool) {
+        Transfer[] memory trs = new Transfer[](transfers.length);
+        
+        for (uint k = 0; k < transfers.length; k++)
+            trs[k] = transfers[k];
+            
+        emit TransferToMany2(trs);
+        
+        transfers.length = 0;
+        
+        return true;
+    }
+    
+    function emitAllTransfers2() public returns (bool) {
+        uint256[] memory data = new uint256[](transfers.length * 2);
+        
+        for (uint k = 0; k < transfers.length; k++) {
+            data[k * 2] = uint256(transfers[k].receiver);
+            data[k * 2 + 1] = transfers[k].amount;
+        }
+            
+        emit TransferToMany3(data);
+        
+        transfers.length = 0;
+        
+        return true;
     }
 }
 

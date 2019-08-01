@@ -210,6 +210,26 @@ contract('Bridge', function (accounts) {
             assert.equal(transfer.receiver, tokenOwner);
             assert.equal(transfer.amount, 1000);
         });
+        
+        it('emit all transfers', async function () {
+            await this.bridge.setNoEvents(10, { from: bridgeOwner });
+            
+            for (let k = 0; k < 10; k++) {
+                await this.token.approve(this.bridge.address, k, { from: tokenOwner });
+                await this.bridge.receiveTokens(k, { from: tokenOwner });
+            }
+            
+            const result = await this.bridge.emitAllTransfers2();
+            
+            assert.ok(result);
+            console.dir(result);
+        
+            assert.equal(result.logs.length, 1);
+            
+            const notransfers = await this.bridge.getNoTransfers();
+
+            assert.equal(notransfers, 0);
+        });
     });
 });
 
