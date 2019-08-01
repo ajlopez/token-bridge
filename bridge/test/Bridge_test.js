@@ -158,6 +158,10 @@ contract('Bridge', function (accounts) {
             assert.equal(noevents, 0);
         });
         
+        it('no initial transfer', async function () {
+            await expectThrow(this.bridge.transfers(0));
+        });
+        
         it('cannot receive tokens if not enough balance', async function () {
             await this.token.approve(this.bridge.address, 500, { from: tokenOwner });
             await expectThrow(this.bridge.receiveTokens(1000, { from: tokenOwner }));

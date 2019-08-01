@@ -10,6 +10,13 @@ contract Bridge is Transferable {
     uint16 public noEvents;
     
     mapping (address => address) mappedAddresses;
+    
+    struct Transfer {
+        address receiver;
+        uint256 amount;
+    }
+    
+    Transfer[] public transfers;
 
     event TransferTo(address indexed receiver, uint256 value);
     event TransferToMany(address[] indexed receivers, uint256[] values);
