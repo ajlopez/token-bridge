@@ -12,7 +12,9 @@ const host = rskapi.host(config.host);
 async function transferToAccount(host, sender, account, amount) {
     const address = account.address ? account.address : account;
     
-    console.log('transferring', amount, 'weis to', address);
+    console.log('transferring', amount, 'weis')
+    console.log('from', sender.address ? sender.address : sender);
+    console.log('to', address);
     
     const txhash = await txs.transfer(host, address, amount, { from: sender });
     
@@ -26,9 +28,15 @@ async function transferToAccount(host, sender, account, amount) {
 
 (async function() {
     const accounts = await host.getAccounts();
-    const sender = accounts[0];
+    let sender = accounts[0];
+    let init = 0;
     
-    for (let k = 0; k < config.accounts.length; k++)
+    if (!sender) {
+        sender = config.accounts[0];
+        init = 1;
+    }
+    
+    for (let k = init; k < config.accounts.length; k++)
         await transferToAccount(host, sender, config.accounts[k], amount);
     
     for (let k = 0; k < config.members.length; k++)
