@@ -1,3 +1,5 @@
 {
-    "confirmations": 0
+    "confirmations": 0,
+    "gasPrice": 60000000
 }
+

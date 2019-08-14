@@ -7,6 +7,8 @@ const config = require('./config.json');
 const Bridge = require('./lib/contracts/bridge');
 const Manager = require('./lib/contracts/manager');
 
+config.gasPrice = config.gasPrice == null ? 0 : config.gasPrice;
+
 const transferEventHash = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 
 const fromchainname = process.argv[2];
@@ -45,7 +47,6 @@ console.log();
     
     const lastBlockNumberVoted = parseInt(await manager.lastBlockNumber(federatorAddress, { from: federatorAddress }));
 
-    
     const options = { to: toBlock };
         
     if (lastBlockNumberVoted)
@@ -109,7 +110,7 @@ async function processLogs(logs) {
             log.transactionHash,
             receiver,
             log.data,
-            { from: federator });
+            { from: federator, gasPrice: config.gasPrice });
         
         console.log("voted");
     }

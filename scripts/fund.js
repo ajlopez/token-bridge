@@ -2,6 +2,9 @@
 const rskapi = require('rskapi');
 const simpleabi = require('simpleabi');
 const txs = require('./lib/txs');
+const conf = require('./config.json');
+
+conf.gasPrice = conf.gasPrice == null ? 0 : conf.gasPrice;
 
 const chainname = process.argv[2];
 const amount = parseInt(process.argv[3]);
@@ -16,7 +19,7 @@ async function transferToAccount(host, sender, account, amount) {
     console.log('from', sender.address ? sender.address : sender);
     console.log('to', address);
     
-    const txhash = await txs.transfer(host, address, amount, { from: sender });
+    const txhash = await txs.transfer(host, address, amount, { from: sender, gasPrice: conf.gasPrice });
     
     console.log('tx hash', txhash);
     

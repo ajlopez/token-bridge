@@ -35,6 +35,8 @@ async function invokeContract(host, address, fnhash, args, options) {
         xtx.sign(privateKey);
         const serializedTx = xtx.serialize();
         
+        console.log('0x' + serializedTx.toString('hex'));
+        
         return await host.sendRawTransaction('0x' + serializedTx.toString('hex'));
     }
     else {
